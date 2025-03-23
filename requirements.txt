@@ -1,1 +1,5 @@
 jupyter
+numpy==2.2.4
+opencv-python-headless==4.11.0.86
+matplotlib==3.10.1
+shapely==2.0.7
