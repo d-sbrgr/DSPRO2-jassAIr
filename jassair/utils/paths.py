@@ -16,6 +16,7 @@ class Datasets(Enum):
     BACKGROUNDS = auto()
     SYNTHETIC_SINGLE = auto()
     SYNTHETIC_MULTIPLE = auto()
+    REAL_LIFE_TEST = auto()
 
 
 def get_dataset_path(dataset: Datasets) -> Path:
@@ -31,5 +32,7 @@ def get_dataset_path(dataset: Datasets) -> Path:
             return source_path / 'synth_single'
         case Datasets.SYNTHETIC_MULTIPLE:
             return source_path / 'synth_multiple'
+        case Datasets.REAL_LIFE_TEST:
+            return source_path / 'real_life_test'
         case _:
             raise ValueError(f"Unknown dataset: {dataset}")
