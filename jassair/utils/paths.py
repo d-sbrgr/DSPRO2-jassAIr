@@ -13,12 +13,26 @@ def get_data_path() -> Path:
 class Datasets(Enum):
     SWISS = auto()
     FRENCH = auto()
+    BACKGROUNDS = auto()
+    SYNTHETIC_SINGLE = auto()
+    SYNTHETIC_MULTIPLE = auto()
+    REAL_LIFE_TEST = auto()
 
 
 def get_dataset_path(dataset: Datasets) -> Path:
     source_path = get_data_path()
-    if dataset == Datasets.SWISS:
-        return source_path / 'swiss-cards'
-    if dataset == Datasets.FRENCH:
-        return source_path / 'french-cards'
-    raise ValueError(f"Unknown dataset: {dataset}")
+    match dataset:
+        case Datasets.SWISS:
+            return source_path / 'swiss-cards'
+        case Datasets.FRENCH:
+            return source_path / 'french-cards'
+        case Datasets.BACKGROUNDS:
+            return source_path / 'backgrounds'
+        case Datasets.SYNTHETIC_SINGLE:
+            return source_path / 'synth_single'
+        case Datasets.SYNTHETIC_MULTIPLE:
+            return source_path / 'synth_multiple'
+        case Datasets.REAL_LIFE_TEST:
+            return source_path / 'real_life_test'
+        case _:
+            raise ValueError(f"Unknown dataset: {dataset}")

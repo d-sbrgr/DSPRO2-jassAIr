@@ -1,1 +1,9 @@
 jupyter
+opencv-python
+numpy
+matplotlib
+lightning
+wandb
+torchvision
+torchmetrics
+shapely==2.0.7
