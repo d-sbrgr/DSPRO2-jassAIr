@@ -1,5 +1,5 @@
 # Custom
-BaselineModel/
+
 data/
 wandb/
 lightning_checkpoints/
