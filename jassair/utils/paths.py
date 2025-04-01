@@ -16,7 +16,7 @@ class Datasets(Enum):
     BACKGROUNDS = auto()
     SYNTHETIC_SINGLE = auto()
     SYNTHETIC_MULTIPLE = auto()
-    REAL_LIFE_TEST = auto()
+    REAL_LIFE_BASELINE = auto()
     REAL_LIFE_YOLO = auto()
 
 
@@ -33,8 +33,8 @@ def get_dataset_path(dataset: Datasets) -> Path:
             return source_path / 'synth_single'
         case Datasets.SYNTHETIC_MULTIPLE:
             return source_path / 'synth_multiple'
-        case Datasets.REAL_LIFE_TEST:
-            return source_path / 'real_life_test'
+        case Datasets.REAL_LIFE_BASELINE:
+            return source_path / 'real_life_baseline'
         case Datasets.REAL_LIFE_YOLO:
             return source_path / 'real_life_yolo'
         case _:
