@@ -17,8 +17,8 @@ def rotate_image(img, angle):
     new_h = int((h * cos) + (w * sin))
 
     # Adjust the rotation matrix to consider the new image size
-    rot_matrix[0, 2] += (new_w / 2) - center[0]
-    rot_matrix[1, 2] += (new_h / 2) - center[1]
+    rot_matrix[0, 2] += (new_w // 2) - center[0]
+    rot_matrix[1, 2] += (new_h // 2) - center[1]
 
     # Perform rotation
     rotated_fg = cv.warpAffine(img, rot_matrix, (new_w, new_h), borderMode=cv.BORDER_CONSTANT, borderValue=(0, 0, 0, 0))
@@ -27,35 +27,24 @@ def rotate_image(img, angle):
 
 
 def add_drop_shadow(card_rgba, offset=(10, 10), blur=15, shadow_intensity=0.5):
+    h_o, w_o = offset
     h, w = card_rgba.shape[:2]
 
-    # Create a blank shadow canvas (with padding to account for shadow offset)
-    shadow = np.zeros((h + offset[1], w + offset[0], 4), dtype=np.uint8)
+    shadow = np.zeros((h + 2*h_o, w + 2*w_o, 4), dtype=np.uint8)
 
-    # Extract alpha channel from the card
     shadow_alpha = card_rgba[:, :, 3]
+    mask = shadow_alpha < 100
+    card_rgba[mask] = 0
+
     shadow_mask = np.zeros_like(shadow[:, :, 3])
-
-    # Place shadow alpha into the shadow mask
-    shadow_mask[offset[1]:offset[1] + h, offset[0]:offset[0] + w] = shadow_alpha
-
-    # Smooth the shadow mask using Gaussian blur
+    shadow_mask[h_o:h_o + h, w_o:w_o + w] = shadow_alpha
     shadow_mask = cv.GaussianBlur(shadow_mask, (0, 0), blur)
 
     # Create semi-transparent black shadow (RGBA)
-    shadow[:, :, :3] = 0
     shadow[:, :, 3] = (shadow_mask * shadow_intensity).astype(np.uint8)
 
     # Place the card on a transparent background
-    canvas = np.zeros_like(shadow, dtype=np.uint8)
-    canvas[offset[1]:offset[1] + h, offset[0]:offset[0] + w] = card_rgba
-
-    # Add the shadow to the card with transparency blending
-    combined = cv.addWeighted(shadow, 1.0, canvas, 1.0, 0)
-
-    # Final blend respecting the alpha channel
-    final_rgba = np.zeros_like(combined, dtype=np.uint8)
-    final_rgba[:, :, :3] = cv.addWeighted(shadow[:, :, :3], 1, canvas[:, :, :3], 1, 0)
-    final_rgba[:, :, 3] = np.maximum(shadow[:, :, 3], canvas[:, :, 3])
-
-    return final_rgba
+    canvas = np.zeros_like(shadow, dtype=np.uint16)
+    canvas[h_o:h_o + h, w_o:w_o + w] = card_rgba
+    canvas[:, :, 3] += shadow[:, :, 3]
+    return np.clip(canvas, 0, 255).astype(np.uint8)

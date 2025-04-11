@@ -11,34 +11,19 @@ def get_data_path() -> Path:
 
 
 class Datasets(Enum):
-    SWISS = auto()
-    FRENCH = auto()
     BACKGROUNDS = auto()
-    SYNTHETIC_SINGLE = auto()
-    SYNTHETIC_MULTIPLE = auto()
+    CARD_TEMPLATE = auto()
     REAL_LIFE_BASELINE = auto()
     REAL_LIFE_YOLO = auto()
-    CARD_TEMPLATE = auto()
+    S_1TO1_2CLASS_GREEN_B = auto()
+    S_1TO1_2CLASS_MULT_B = auto()
+    S_1TO1_10CLASS_MULT_B = auto()
+    S_1TO2_20CLASS_MULT_B = auto()
+    S_1TO2_36CLASS_MULT_B = auto()
 
 
 def get_dataset_path(dataset: Datasets) -> Path:
     source_path = get_data_path()
-    match dataset:
-        case Datasets.SWISS:
-            return source_path / 'swiss-cards'
-        case Datasets.FRENCH:
-            return source_path / 'french-cards'
-        case Datasets.BACKGROUNDS:
-            return source_path / 'backgrounds'
-        case Datasets.SYNTHETIC_SINGLE:
-            return source_path / 'synth_single'
-        case Datasets.SYNTHETIC_MULTIPLE:
-            return source_path / 'synth_multiple'
-        case Datasets.REAL_LIFE_BASELINE:
-            return source_path / 'real_life_baseline'
-        case Datasets.REAL_LIFE_YOLO:
-            return source_path / 'real_life_yolo'
-        case Datasets.CARD_TEMPLATE:
-            return source_path / 'card_template'
-        case _:
-            raise ValueError(f"Unknown dataset: {dataset}")
+    if dataset in Datasets:
+        return source_path / dataset.name.lower()
+    raise ValueError(f"Unknown dataset: {dataset}")
