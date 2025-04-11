@@ -18,6 +18,7 @@ class Datasets(Enum):
     SYNTHETIC_MULTIPLE = auto()
     REAL_LIFE_BASELINE = auto()
     REAL_LIFE_YOLO = auto()
+    CARD_TEMPLATE = auto()
 
 
 def get_dataset_path(dataset: Datasets) -> Path:
@@ -37,5 +38,7 @@ def get_dataset_path(dataset: Datasets) -> Path:
             return source_path / 'real_life_baseline'
         case Datasets.REAL_LIFE_YOLO:
             return source_path / 'real_life_yolo'
+        case Datasets.CARD_TEMPLATE:
+            return source_path / 'card_template'
         case _:
             raise ValueError(f"Unknown dataset: {dataset}")
