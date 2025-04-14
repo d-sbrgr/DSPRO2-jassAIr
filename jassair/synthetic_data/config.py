@@ -1,4 +1,9 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
+from typing import Callable
+
+import numpy as np
 
 from .image_augmentation import Augmentation
 
@@ -18,3 +23,8 @@ class SynthConfig:
 
     classes: list[int] = field(default_factory=list)
     backgrounds: list[int] = field(default_factory=list)
+
+    generation_methods: list[GenerationFunction] = field(default_factory=list)
+
+
+GenerationFunction = Callable[[np.ndarray, list[np.ndarray], SynthConfig], tuple[np.ndarray, list[str]]]
