@@ -13,13 +13,11 @@ def get_data_path() -> Path:
 class Datasets(Enum):
     BACKGROUNDS = auto()
     CARD_TEMPLATE = auto()
-    REAL_LIFE_BASELINE = auto()
-    REAL_LIFE_YOLO = auto()
-    S_1TO1_2CLASS_GREEN_B = auto()
-    S_1TO1_2CLASS_MULT_B = auto()
-    S_1TO1_10CLASS_MULT_B = auto()
-    S_1TO2_20CLASS_MULT_B = auto()
-    S_1TO2_36CLASS_MULT_B = auto()
+    R_1TO1_36C_NOVLP = auto()
+    R_1TO9_36C_NOVLP = auto()
+    S_1TO1_36C_NOVLP = auto()
+    S_1TO9_36C_NOVLP = auto()
+    S_1TO9_36C_OVLP = auto()
 
 
 def get_dataset_path(dataset: Datasets) -> Path:
