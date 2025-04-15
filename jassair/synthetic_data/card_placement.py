@@ -48,3 +48,18 @@ def add_drop_shadow(card_rgba, offset=(10, 10), blur=15, shadow_intensity=0.5):
     canvas[h_o:h_o + h, w_o:w_o + w] = card_rgba
     canvas[:, :, 3] += shadow[:, :, 3]
     return np.clip(canvas, 0, 255).astype(np.uint8)
+
+
+def get_yolo_boxes(regions: np.ndarray, num_cards: int) -> list[str]:
+    result = []
+    h, w = regions.shape[:2]
+    for index in range(1, num_cards + 1):
+        y_indices, x_indices = np.where(regions == index)
+        min_x, max_x = x_indices.min(), x_indices.max()
+        min_y, max_y = y_indices.min(), y_indices.max()
+        cx = (min_x + max_x) / (2 * w)
+        cy = (min_y + max_y) / (2 * h)
+        bw = (max_x - min_x) / w
+        bh = (max_y - min_y) / h
+        result.append(f"{cx} {cy} {bw} {bh}")
+    return result
