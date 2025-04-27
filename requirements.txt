@@ -7,3 +7,6 @@ wandb
 torchvision
 torchmetrics
 shapely==2.0.7
+fastapi
+uvicorn[standard]
+jass-kit

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>jass[AI]r Game Monitor</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script defer src="/static/app.js"></script>
+</head>
+<body>
+  <h1>jass[AI]r Game Monitor</h1>
+
+  <!-- FLEX CONTAINER -->
+  <div class="flex-container">
+
+    <!-- LEFT SIDE: Game State -->
+    <div class="left-column">
+      <div class="section" id="game-state-section">
+        <h2>Game State</h2>
+        <div id="game-state">Loading...</div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: Detection + Bot -->
+    <div class="right-column">
+
+      <div class="section" id="bot-section">
+        <h2>Bot Action</h2>
+        <div id="bot-state">Loading...</div>
+      </div>
+
+       <div class="section" id="detection-section">
+        <h2>YOLO Detection</h2>
+        <div id="detection-state">Loading...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONTROLS BELOW -->
+  <div class="section" id="control-section">
+    <h2>Game Controls</h2>
+    <button id="next-player-btn" onclick="nextPlayer()">Next Player</button>
+    <button id="push-btn" onclick="pushAction()">Push</button>
+  </div>
+
+  <div class="section" id="correction-section">
+    <h2>Submit Correction</h2>
+    <input type="text" id="correction-input" placeholder="Enter correct card">
+    <button onclick="submitCorrection()">Submit Correction</button>
+  </div>
+
+</body>
+
+</html>
