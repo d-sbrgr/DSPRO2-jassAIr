@@ -18,6 +18,7 @@ class Datasets(Enum):
     S_1TO1_36C_NOVLP = auto()
     S_1TO9_36C_NOVLP = auto()
     S_1TO9_36C_OVLP = auto()
+    SRF_1TO9_36C_MOVLP = auto()
 
 
 def get_dataset_path(dataset: Datasets) -> Path:
