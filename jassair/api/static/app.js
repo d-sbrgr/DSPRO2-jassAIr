@@ -110,3 +110,8 @@ async function pushAction() {
     method: 'POST'
   });
 }
+
+async function updateFeed() {
+    var camIndex = document.getElementById('camera-select').value;
+    document.getElementById('video').src = '/video_feed?cam_index=' + camIndex;
+}

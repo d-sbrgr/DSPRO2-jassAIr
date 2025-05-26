@@ -9,6 +9,39 @@
 <body>
   <h1>jass[AI]r Game Monitor</h1>
 
+  <div class="flex-container">
+    <div class="left-column">
+      <label for="camera-select"><strong>Choose camera:</strong></label>
+      <select id="camera-select" onchange="updateFeed()">
+        <option>Loading cameras...</option>
+      </select>
+      <div style="margin-top: 15px;">
+        <img id="video" src="/video_feed?cam_index=0" width="100%" style="max-width: 640px; border-radius: 12px; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);" />
+      </div>
+      <script>
+        window.onload = async function() {
+          const res = await fetch('/cameras');
+          const data = await res.json();
+          const select = document.getElementById('camera-select');
+          select.innerHTML = '';  // clear loading message
+          data.cameras.forEach(cam => {
+            const opt = document.createElement('option');
+            opt.value = cam;
+            opt.textContent = `Camera ${cam}`;
+            select.appendChild(opt);
+          });
+        };
+      </script>
+    </div>
+
+    <div class="right-column">
+      <div class="section" id="detection-section">
+        <h2>YOLO Detection</h2>
+        <div id="detection-state">Loading...</div>
+      </div>
+    </div>
+  </div>
+
   <!-- FLEX CONTAINER -->
   <div class="flex-container">
 
@@ -26,11 +59,6 @@
       <div class="section" id="bot-section">
         <h2>Bot Action</h2>
         <div id="bot-state">Loading...</div>
-      </div>
-
-       <div class="section" id="detection-section">
-        <h2>YOLO Detection</h2>
-        <div id="detection-state">Loading...</div>
       </div>
     </div>
 

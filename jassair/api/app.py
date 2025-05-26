@@ -1,7 +1,13 @@
+import cv2
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+
+from ultralytics import YOLO
+
+model = YOLO("../../artifacts/yolov11-finetuned-model-non-overlapping-v0/best.pt")
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -34,6 +40,34 @@ class CardUpdate(BaseModel):
 
 class AgentPlayUpdate(BaseModel):
     played_card: str
+
+
+def list_available_cameras(max_tested=5):
+    available = []
+    for i in range(max_tested):
+        cap = cv2.VideoCapture(i)
+        if cap.read()[0]:
+            available.append(i)
+        cap.release()
+    return available
+
+def gen_frames(cam_index=0):
+    camera = cv2.VideoCapture(cam_index)
+    while True:
+        success, frame = camera.read()
+        if not success:
+            break
+        results = model(frame)[0]
+        for result in results:
+            confidence = float(result.boxes.conf)
+            cls = int(result.boxes.cls)
+            x1, y1, x2, y2 = result.boxes.xyxy.numpy()[0]
+            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+            cv2.putText(frame, f"{model.names[int(cls)]} {confidence:.2f}", (int(x1), int(y1) - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
+        yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
@@ -80,6 +114,15 @@ async def next_player():
 async def push_action():
     print("Push action triggered!")
     return {"status": "push action completed"}
+
+
+@app.get("/video_feed")
+def video_feed(cam_index: int = 0):
+    return StreamingResponse(gen_frames(cam_index), media_type="multipart/x-mixed-replace; boundary=frame")
+
+@app.get("/cameras")
+async def get_cameras():
+    return {"cameras": list_available_cameras()}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
