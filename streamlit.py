@@ -1,7 +1,7 @@
 from ultralytics import solutions
 
 inf = solutions.Inference(
-    model="artifacts/yolov11-finetuned-model-non-overlapping:v0/best.pt"
+    model="artifacts/yolov11-finetuned-model-non-overlapping-v0/best.pt"
 )
 inf.inference()
 
