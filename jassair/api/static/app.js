@@ -81,24 +81,6 @@ function connectWebSocket() {
 
 connectWebSocket();
 
-async function submitCorrection() {
-  const input = document.getElementById('correction-input');
-  const correctCard = input.value.trim();
-
-  if (!correctCard) {
-    alert("Please enter a card code!");
-    return;
-  }
-
-  await fetch('/correction', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({correct_card: correctCard})
-  });
-
-  input.value = '';
-}
-
 async function nextPlayer() {
   await fetch('/next_player', {
     method: 'POST'
