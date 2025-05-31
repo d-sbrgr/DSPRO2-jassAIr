@@ -3,7 +3,6 @@ from itertools import cycle
 
 from ultralytics.engine.results import Results
 
-
 logger = logging.getLogger("Detection")
 
 

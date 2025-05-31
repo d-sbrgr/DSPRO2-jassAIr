@@ -1,18 +1,8 @@
 let socket;
-let detectedCards = [];
 
 function updateGameState(data) {
   const { game_state, detection_state, bot_state } = data;
 
-  // Update local detectedCards array
-  if (detection_state.detected_cards) {
-    detectedCards = detection_state.detected_cards;
-  } else if (detection_state.last_detected_card) {
-    // Fallback if only last detected is available
-    detectedCards.push(detection_state.last_detected_card);
-  }
-
-  // Render Trick
   let trickHtml = "";
   for (let i = 0; i < 4; i++) {
     const card = game_state.current_trick[i];
@@ -33,8 +23,7 @@ function updateGameState(data) {
     <div><strong>Current Trick:</strong><br><div class="trick-container">${trickHtml}</div></div>
   `;
 
-  // Render Detected Cards Carousel
-  const detectionHtml = detectedCards.map(card => `
+  const detectionHtml = detection_state.detected_cards.map(card => `
     <div class="card-frame">
       <img class="card" src="/static/cards/${card}.png" alt="${card}">
     </div>
@@ -45,7 +34,6 @@ function updateGameState(data) {
     <div class="carousel-container">${detectionHtml}</div>
   `;
 
-  // Bot Action
   const agentCard = bot_state.last_agent_play;
   document.getElementById('bot-state').innerHTML = `
     <div class="card-container">
@@ -60,26 +48,6 @@ function updateGameState(data) {
     </div>
   `;
 }
-
-function connectWebSocket() {
-  socket = new WebSocket(`ws://${location.host}/ws`);
-
-  socket.onopen = function() {
-    console.log('WebSocket connection established');
-  };
-
-  socket.onmessage = function(event) {
-    const data = JSON.parse(event.data);
-    updateGameState(data);
-  };
-
-  socket.onclose = function() {
-    console.log('WebSocket connection closed. Reconnecting in 2s...');
-    setTimeout(connectWebSocket, 2000);
-  };
-}
-
-connectWebSocket();
 
 function resetGame() {
     fetch('/reset_game', {
@@ -110,3 +78,21 @@ async function updateFeed() {
     var camIndex = document.getElementById('camera-select').value;
     document.getElementById('video').src = '/video_feed?cam_index=' + camIndex;
 }
+
+function connectWebSocket() {
+  socket = new WebSocket(`ws://${location.host}/ws`);
+
+  socket.onopen = function() {
+  };
+
+  socket.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    updateGameState(data);
+  };
+
+  socket.onclose = function() {
+    setTimeout(connectWebSocket, 2000);
+  };
+}
+
+connectWebSocket();

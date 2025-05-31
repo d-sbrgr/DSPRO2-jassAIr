@@ -1,18 +1,17 @@
-import logging
-import colorsys
-import cv2
-
-from contextlib import asynccontextmanager
 import asyncio
+import colorsys
+import logging
+from contextlib import asynccontextmanager
+
+import cv2
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from game_logic import GameLogic
-
 from ultralytics import YOLO
 
-# Configure logger to show all levels and format in a readable way if possible color different levels differently
+from game_logic import GameLogic
+
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(name)s - %(message)s')
 logger = logging.getLogger("App")
 model = YOLO("../../artifacts/yolov11-finetuned-model-non-overlapping-v0/best.pt")
@@ -30,12 +29,8 @@ class TrumpActionRequest(BaseModel):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Start background task
     broadcast_task = asyncio.create_task(broadcast_loop())
-
-    yield  # App is running
-
-    # Shutdown logic
+    yield
     broadcast_task.cancel()
     try:
         await broadcast_task

@@ -1,13 +1,13 @@
-import numpy as np
-import requests
 import logging
 
+import numpy as np
+import requests
 from jass.game.const import card_ids, TRUMP_FULL_OFFSET
-from jass.service.player_service_route import PLAY_CARD_PATH_PREFIX, SELECT_TRUMP_PATH_PREFIX
-from jass.game.game_state import GameState as JassGameState
-from jass.game.game_sim import GameSim
 from jass.game.game_rule import GameRule
+from jass.game.game_sim import GameSim
+from jass.game.game_state import GameState as JassGameState
 from jass.game.rule_schieber import RuleSchieber
+from jass.service.player_service_route import PLAY_CARD_PATH_PREFIX, SELECT_TRUMP_PATH_PREFIX
 
 logger = logging.getLogger("GameState")
 

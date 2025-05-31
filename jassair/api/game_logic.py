@@ -1,10 +1,11 @@
-from typing import Any
 import logging
+from typing import Any
 
-from ultralytics.engine.results import Results
 from jass.game.const import TRUMP_FULL_P
-from jass_game.game_state import GameState
+from ultralytics.engine.results import Results
+
 from jass_game.detection_state import DetectionState
+from jass_game.game_state import GameState
 
 logger = logging.getLogger("GameLogic")
 
