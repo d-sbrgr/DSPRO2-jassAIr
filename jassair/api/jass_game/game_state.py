@@ -129,3 +129,4 @@ class GameState:
         self._sim = GameSim(self.rule)
         self._dealer = dealer
         self._player = player
+        self._player_action = None

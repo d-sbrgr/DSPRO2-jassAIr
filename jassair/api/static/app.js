@@ -49,8 +49,8 @@ function updateGameState(data) {
   `;
 }
 
-function resetGame() {
-    fetch('/reset_game', {
+async function resetGame() {
+    await fetch('/reset_game', {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -62,8 +62,8 @@ function resetGame() {
     });
 }
 
-function trumpAction() {
-    fetch('/trump_action', {
+async function trumpAction() {
+    await fetch('/trump_action', {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'

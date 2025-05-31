@@ -12,7 +12,7 @@ from ultralytics import YOLO
 
 from game_logic import GameLogic
 
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(name)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(name)s - %(message)s')
 logger = logging.getLogger("App")
 model = YOLO("../../artifacts/yolov11-finetuned-model-non-overlapping-v0/best.pt")
 game_logic = GameLogic()
@@ -43,7 +43,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 clients = []
 
 
-def list_available_cameras(max_tested=5):
+def list_available_cameras(max_tested=2):
     available = []
     for i in range(max_tested):
         cap = cv2.VideoCapture(i)
@@ -94,8 +94,11 @@ def gen_frames(cam_index=0):
 
 async def broadcast_loop():
     while True:
-        await broadcast_state()
-        await asyncio.sleep(1)  # Send updates every 1 second (adjust as needed)
+        try:
+            await broadcast_state()
+        except Exception as e:
+            logger.error(f"Error during broadcast_state: {e}")
+        await asyncio.sleep(1)
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
@@ -142,9 +145,4 @@ async def websocket_endpoint(websocket: WebSocket):
 async def broadcast_state():
     to_remove = []
     for client in clients:
-        try:
-            await client.send_json(game_logic.to_json())
-        except:
-            to_remove.append(client)
-    for client in to_remove:
-        clients.remove(client)
+        await client.send_json(game_logic.to_json())

@@ -31,10 +31,10 @@ class GameLogic:
             }
         current_trick = []
         if self._card_names:
-            current_trick = [state.current_trick]
+            current_trick = [self._card_names[card] for card in self._game_state.current_trick]
         return {
             "current_player": PLAYERS[state.player],
-            "current_trumpf": PLAYERS[state.trump],
+            "current_trumpf": TRUMPS[state.trump],
             "current_trick": current_trick,
         }
 
@@ -74,6 +74,8 @@ class GameLogic:
     def reset(self, dealer: int, player: int):
         self._game_state.reset(dealer, player)
         self._detection_state.reset()
+        self._detected_cards.clear()
+        self._card_names = None
 
     def __call__(self, results: Results) -> list[int]:
         if self._card_names is None:
