@@ -1,3 +1,4 @@
+import logging
 import colorsys
 import cv2
 
@@ -11,8 +12,20 @@ from game_logic import GameLogic
 
 from ultralytics import YOLO
 
+# Configure logger to show all levels and format in a readable way if possible color different levels differently
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(name)s - %(message)s')
+logger = logging.getLogger("App")
 model = YOLO("../../artifacts/yolov11-finetuned-model-non-overlapping-v0/best.pt")
 game_logic = GameLogic()
+
+
+class ResetGameRequest(BaseModel):
+    dealer: str
+    player: str
+
+
+class TrumpActionRequest(BaseModel):
+    action: str
 
 
 @asynccontextmanager
@@ -34,15 +47,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 clients = []
 
-class CorrectionRequest(BaseModel):
-    correct_card: str
-
-class CardUpdate(BaseModel):
-    detected_card: str
-
-class AgentPlayUpdate(BaseModel):
-    played_card: str
-
 
 def list_available_cameras(max_tested=5):
     available = []
@@ -51,6 +55,7 @@ def list_available_cameras(max_tested=5):
         if cap.read()[0]:
             available.append(i)
         cap.release()
+    logger.info(f"Available cameras: {available}")
     return available
 
 def generate_distinct_colors(n):
@@ -105,34 +110,20 @@ async def root():
 @app.get("/state")
 async def get_state():
     state = game_logic.to_json()
-    print("Returning state:", state)
+    logger.info(f"get_state: {state}")
     return JSONResponse(content=state)
 
-@app.post("/update_card")
-async def update_card(card_update: CardUpdate):
-    #detection_state["detected_cards"].append(card_update.detected_card)
-    await broadcast_state()
-    return {"status": "card updated"}
+@app.put("/reset_game", status_code=204)
+async def reset_game(req: ResetGameRequest):
+    logger.info(f"reset_game: {req.dealer}, {req.player}")
+    game_logic.reset(dealer=int(req.dealer), player=int(req.player))
+    return
 
-@app.post("/update_agent_play")
-async def update_agent_play(agent_update: AgentPlayUpdate):
-    #bot_state["last_agent_play"] = agent_update.played_card
-    await broadcast_state()
-    return {"status": "agent play updated"}
-
-@app.post("/next_player")
-async def next_player():
-    #player_order = ["NORTH", "EAST", "SOUTH", "WEST"]
-    #current_index = player_order.index(game_state["current_player"])
-    #game_state["current_player"] = player_order[(current_index + 1) % 4]
-    await broadcast_state()
-    return {"status": "next player set"}
-
-@app.post("/push")
-async def push_action():
-    print("Push action triggered!")
-    return {"status": "push action completed"}
-
+@app.put("/trump_action", status_code=204)
+async def trump_action(req: TrumpActionRequest):
+    logger.info(f"trump_action: {req.action}")
+    game_logic.action(int(req.action))
+    return
 
 @app.get("/video_feed")
 def video_feed(cam_index: int = 0):

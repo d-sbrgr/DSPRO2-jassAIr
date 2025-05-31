@@ -34,8 +34,40 @@
       </script>
       <div class="section" id="control-section">
         <h2>Game Controls</h2>
-        <button id="next-player-btn" onclick="nextPlayer()">Next Player</button>
-        <button id="push-btn" onclick="pushAction()">Push</button>
+        <div class="control-group">
+          <label for="dealer-select"><strong>Dealer:</strong></label>
+          <select id="dealer-select">
+            <option value="0">Player 1 (NORTH)</option>
+            <option value="1">Player 2 (EAST)</option>
+            <option value="2">Player 3 (SOUTH)</option>
+            <option value="3">Player 4 (WEST)</option>
+          </select>
+
+          <label for="player-select"><strong>Bot Player:</strong></label>
+          <select id="player-select">
+            <option value="0">Player 1 (NORTH)</option>
+            <option value="1">Player 2 (EAST)</option>
+            <option value="2">Player 3 (SOUTH)</option>
+            <option value="3">Player 4 (WEST)</option>
+          </select>
+
+          <button id="reset-game-btn" onclick="resetGame()">Start Game</button>
+        </div>
+
+        <div class="control-group">
+          <label for="trump-select"><strong>Trump Action:</strong></label>
+          <select id="trump-select">
+            <option value="36">Schelle</option>
+            <option value="37">Rose</option>
+            <option value="38">Schilte</option>
+            <option value="39">Eichel</option>
+            <option value="40">Obe-Abe</option>
+            <option value="41">Une-Ufe</option>
+            <option value="42">Schiebe</option>
+          </select>
+
+          <button id="trump-btn" onclick="trumpAction()">Confirm</button>
+        </div>
       </div>
     </div>
 

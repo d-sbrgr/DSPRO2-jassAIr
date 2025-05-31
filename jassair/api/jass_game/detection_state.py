@@ -1,7 +1,10 @@
-from collections.abc import Iterable
+import logging
 from itertools import cycle
 
 from ultralytics.engine.results import Results
+
+
+logger = logging.getLogger("Detection")
 
 
 class CardState:
@@ -11,7 +14,9 @@ class CardState:
         self._presence_threshold = presence_threshold
         self._rolling_window = [False] * window_size
         self._index = cycle(range(window_size))
-        pass
+
+    def reset(self):
+        self._rolling_window = [False] * len(self._rolling_window)
 
     @property
     def is_active(self) -> bool:
@@ -30,7 +35,14 @@ class DetectionState:
         self._detected_cards = [False for _ in range(num_cards)]
         self._num_cards = num_cards
 
+    def reset(self):
+        logger.info("Reset")
+        for card in self._cards:
+            card.reset()
+        self._detected_cards = [False for _ in range(self._num_cards)]
+
     def correct_detection(self, old_card_index: int, new_card_index: int):
+        logger.info(f"Correction: {old_card_index} -> {new_card_index}")
         self._detected_cards[old_card_index] = False
         self._detected_cards[new_card_index] = True
 
@@ -39,9 +51,11 @@ class DetectionState:
         for r in results:
             if self._cards[int(r.boxes.cls)].is_active:
                 result.append(int(r.boxes.cls))
+        logger.debug(f"Active detections: {result}")
         return result
 
     def __call__(self, results: Results) -> tuple[int, ...]:
+        logger.debug("Detection call")
         detections = []
         for index in range(self._num_cards):
             is_present = False
@@ -52,5 +66,6 @@ class DetectionState:
             if self._cards[index](is_present):
                 if not self._detected_cards[index]:
                     detections.append(index)
+                    logger.info(f"Detected card {index}")
                     self._detected_cards[index] = True
         return tuple(detections)

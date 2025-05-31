@@ -1,5 +1,6 @@
 import numpy as np
 import requests
+import logging
 
 from jass.game.const import card_ids, TRUMP_FULL_OFFSET
 from jass.service.player_service_route import PLAY_CARD_PATH_PREFIX, SELECT_TRUMP_PATH_PREFIX
@@ -7,6 +8,8 @@ from jass.game.game_state import GameState as JassGameState
 from jass.game.game_sim import GameSim
 from jass.game.game_rule import GameRule
 from jass.game.rule_schieber import RuleSchieber
+
+logger = logging.getLogger("GameState")
 
 
 YOLO_2_JASS = np.array([
@@ -75,15 +78,28 @@ class GameState:
             return self._sim.state
         return None
 
+    @property
+    def last_agent_play(self) -> int | None:
+        return self._player_action
+
+    @property
+    def current_trick(self) -> list[int]:
+        if not self._sim:
+            return []
+        return [int((YOLO_2_JASS == card).nonzero()[0][0]) for card in self._sim.state.current_trick if card > -1]
+
     def action(self, card: int):
         if len(self._player_cards) < 9:
             self._player_cards.append(YOLO_2_JASS[card])
+            logger.info(f"Init action {len(self._player_cards)}/9")
             if len(self._player_cards) == 9:
+                logger.info("Sim init")
                 hands =  np.zeros(shape=[4, 36], dtype=np.int32)
                 hands[self._player][self._player_cards] = 1
                 self._sim.init_from_cards(hands, self._dealer)
                 self.get_bot_move()
         else:
+            logger.info("Sim action")
             action = YOLO_2_JASS[card]
             self._sim.action(action)
             self.get_bot_move()
@@ -92,18 +108,23 @@ class GameState:
         if self._sim.state.player == self._player:
             data = self._sim.get_observation().to_json()
             if self._sim.state.trump == -1:
+                logger.info("Start Bot trump action")
                 response = requests.post(self._url + SELECT_TRUMP_PATH_PREFIX, json=data, timeout=self.timeout)
                 response_data = response.json()
                 action = int(response_data['trump']) + TRUMP_FULL_OFFSET
+                logger.info(f"Complete Bot trump action ({action})")
             else:
+                logger.info("Start Bot card action")
                 response = requests.post(self._url + PLAY_CARD_PATH_PREFIX, json=data, timeout=self.timeout)
                 response_data = response.json()
                 card = response_data['card']
                 action = card_ids[card]
-            self._player_action = int((YOLO_2_JASS == 12).nonzero()[0][0])
+                logger.info(f"Complete Bot card action ({action})")
+            self._player_action = int((YOLO_2_JASS == action).nonzero()[0][0])
             self.action(action)
 
     def reset(self, dealer: int, player: int):
+        logger.info("Reset")
         self._player_cards.clear()
         self._sim = GameSim(self.rule)
         self._dealer = dealer

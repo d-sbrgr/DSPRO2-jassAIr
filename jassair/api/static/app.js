@@ -1,5 +1,5 @@
 let socket;
-let detectedCards = []; // 🔥 local array to keep track
+let detectedCards = [];
 
 function updateGameState(data) {
   const { game_state, detection_state, bot_state } = data;
@@ -81,16 +81,29 @@ function connectWebSocket() {
 
 connectWebSocket();
 
-async function nextPlayer() {
-  await fetch('/next_player', {
-    method: 'POST'
-  });
+function resetGame() {
+    fetch('/reset_game', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            dealer: document.getElementById('dealer-select').value,
+            player: document.getElementById('player-select').value
+        })
+    });
 }
 
-async function pushAction() {
-  await fetch('/push', {
-    method: 'POST'
-  });
+function trumpAction() {
+    fetch('/trump_action', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            action: document.getElementById('trump-select').value
+        })
+    });
 }
 
 async function updateFeed() {
