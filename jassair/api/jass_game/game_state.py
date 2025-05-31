@@ -62,7 +62,7 @@ YOLO_2_JASS = np.array([
 
 class GameState:
     rule: GameRule = RuleSchieber()
-    timeout: int = 10.0
+    timeout: int = 12.0
 
     def __init__(self, url: str = "https://jassair-470541508978.europe-west1.run.app/jassager"):
         self._player_cards: list[int] = []
