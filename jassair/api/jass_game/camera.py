@@ -17,7 +17,7 @@ def list_available_cameras(max_tested=2):
     available = []
     for i in range(max_tested):
         try:
-            cap = cv2.VideoCapture(i, cv2.CAP_DSHOW)
+            cap = cv2.VideoCapture(i)
             if cap.read()[0]:
                 available.append(i)
             cap.release()
@@ -27,7 +27,7 @@ def list_available_cameras(max_tested=2):
     return available
 
 def gen_frames(cam_index=0):
-    camera = cv2.VideoCapture(cam_index, cv2.CAP_DSHOW)
+    camera = cv2.VideoCapture(cam_index)
     try:
         while True:
             success, frame = camera.read()
