@@ -112,16 +112,16 @@ class GameState:
                 response = requests.post(self._url + SELECT_TRUMP_PATH_PREFIX, json=data, timeout=self.timeout)
                 response_data = response.json()
                 action = int(response_data['trump']) + TRUMP_FULL_OFFSET
-                logger.info(f"Complete Bot trump action ({action})")
             else:
                 logger.info("Start Bot card action")
                 response = requests.post(self._url + PLAY_CARD_PATH_PREFIX, json=data, timeout=self.timeout)
                 response_data = response.json()
                 card = response_data['card']
                 action = card_ids[card]
-                logger.info(f"Complete Bot card action ({action})")
-            self._player_action = int((YOLO_2_JASS == action).nonzero()[0][0])
-            self.action(action)
+            yolo_move = int((YOLO_2_JASS == action).nonzero()[0][0])
+            logger.info(f"Complete Bot card action ({yolo_move})")
+            self._player_action = yolo_move
+            self.action(yolo_move)
 
     def reset(self, dealer: int, player: int):
         logger.info("Reset")

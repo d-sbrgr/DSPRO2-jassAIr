@@ -74,9 +74,38 @@ async function trumpAction() {
     });
 }
 
+async function loadCamerasAndStartFeed() {
+    try {
+        const response = await fetch('/cameras');
+        const data = await response.json();
+        const cameras = data.cameras;
+
+        if (!cameras || cameras.length === 0) {
+            alert('No cameras found.');
+            return;
+        }
+
+        const cameraSelect = document.getElementById('camera-select');
+        cameraSelect.innerHTML = ''; // Clear existing options
+
+        cameras.forEach((camIndex) => {
+            const option = document.createElement('option');
+            option.value = camIndex;
+            option.textContent = `Camera ${camIndex}`;
+            cameraSelect.appendChild(option);
+        });
+
+        // Set the video feed to the first camera by default
+        document.getElementById('video').src = `/video_feed?cam_index=${cameras[0]}`;
+    } catch (err) {
+        console.error('Error fetching cameras:', err);
+        alert('Failed to load cameras.');
+    }
+}
+
 async function updateFeed() {
-    var camIndex = document.getElementById('camera-select').value;
-    document.getElementById('video').src = '/video_feed?cam_index=' + camIndex;
+  var camIndex = document.getElementById('camera-select').value;
+  document.getElementById('video').src = '/video_feed?cam_index=' + camIndex;
 }
 
 function connectWebSocket() {
@@ -95,4 +124,41 @@ function connectWebSocket() {
   };
 }
 
+function connectLogSocket() {
+    const logSocket = new WebSocket(`ws://${location.host}/log`);
+    const logConsole = document.getElementById('log-console');
+
+    socket.onopen = function() {
+    };
+
+    logSocket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        const level = data.level.toLowerCase();
+        const msg = data.message;
+
+        const line = document.createElement('div');
+        line.className = `log-${level}`;
+        line.textContent = msg;
+
+        logConsole.appendChild(line);
+        logConsole.scrollTop = logConsole.scrollHeight;
+    };
+
+    logSocket.onclose = () => {
+        const line = document.createElement('div');
+        line.className = 'log-warning';
+        line.textContent = '[Log] Disconnected from server. Reconnecting...';
+        logConsole.appendChild(line);
+        setTimeout(connectLogSocket, 2000);  // auto-reconnect
+    };
+}
+
 connectWebSocket();
+
+window.addEventListener('DOMContentLoaded', () => {
+    loadCamerasAndStartFeed();
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    connectLogSocket();
+});

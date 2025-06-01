@@ -16,20 +16,40 @@
         <option>Loading cameras...</option>
       </select>
       <div style="margin-top: 15px;">
-        <img id="video" src="/video_feed?cam_index=0" width="100%" style="max-width: 640px; border-radius: 12px; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);" />
+        <img id="video" src="" width="100%" style="max-width: 640px; border-radius: 12px; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);" />
       </div>
       <script>
-        window.onload = async function() {
-          const res = await fetch('/cameras');
-          const data = await res.json();
+        window.onload = async function () {
           const select = document.getElementById('camera-select');
-          select.innerHTML = '';  // clear loading message
-          data.cameras.forEach(cam => {
-            const opt = document.createElement('option');
-            opt.value = cam;
-            opt.textContent = `Camera ${cam}`;
-            select.appendChild(opt);
-          });
+          const video = document.getElementById('video');
+
+          try {
+            const res = await fetch('/cameras');
+            const data = await res.json();
+            const cameras = data.cameras;
+
+            if (!cameras || cameras.length === 0) {
+              select.innerHTML = '<option disabled>No cameras found</option>';
+              alert('No cameras found.');
+              return;
+            }
+
+            // Populate camera select
+            select.innerHTML = '';
+            cameras.forEach((cam, index) => {
+              const opt = document.createElement('option');
+              opt.value = cam;
+              opt.textContent = `Camera ${cam}`;
+              select.appendChild(opt);
+            });
+
+            // Set default video feed to first available camera
+            video.src = `/video_feed?cam_index=${cameras[0]}`;
+            select.value = cameras[0];
+          } catch (err) {
+            console.error('Failed to load cameras:', err);
+            select.innerHTML = '<option disabled>Error loading cameras</option>';
+          }
         };
       </script>
       <div class="section" id="control-section">
@@ -85,6 +105,10 @@
         <div id="game-state">Loading...</div>
       </div>
     </div>
+  </div>
+  <div class="section" id="log-section">
+    <h2>Application Logs</h2>
+    <div id="log-console" class="log-console">Connecting...</div>
   </div>
 
 </body>

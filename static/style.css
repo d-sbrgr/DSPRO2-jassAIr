@@ -201,3 +201,22 @@ select:focus {
   border-color: #2575fc;
   outline: none;
 }
+
+.log-console {
+  background-color: #111;
+  color: #eee;
+  font-family: monospace;
+  font-size: 0.85rem;
+  padding: 10px;
+  border-radius: 8px;
+  height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.4);
+}
+
+.log-info { color: #00cc66; }
+.log-warning { color: #ffcc00; }
+.log-error { color: #ff4444; }
+.log-debug { color: #9999ff; }
+.log-critical { color: #ff00ff; }

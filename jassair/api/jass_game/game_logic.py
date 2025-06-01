@@ -4,8 +4,8 @@ from typing import Any
 from jass.game.const import TRUMP_FULL_P
 from ultralytics.engine.results import Results
 
-from jass_game.detection_state import DetectionState
-from jass_game.game_state import GameState
+from .detection_state import DetectionState
+from .game_state import GameState
 
 logger = logging.getLogger("GameLogic")
 
