@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>jass[AI]r Game Monitor</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script defer src="/static/app.js"></script>
+</head>
+<body>
+  <h1>jass[AI]r Game Monitor</h1>
+
+  <div class="flex-container">
+    <div class="left-column">
+      <label for="camera-select"><strong>Choose camera:</strong></label>
+      <select id="camera-select" onchange="updateFeed()">
+        <option>Loading cameras...</option>
+      </select>
+      <div style="margin-top: 15px;">
+        <img id="video" src="" width="100%" style="max-width: 640px; border-radius: 12px; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);" />
+      </div>
+      <script>
+        window.onload = async function () {
+          const select = document.getElementById('camera-select');
+          const video = document.getElementById('video');
+
+          try {
+            const res = await fetch('/cameras');
+            const data = await res.json();
+            const cameras = data.cameras;
+
+            if (!cameras || cameras.length === 0) {
+              select.innerHTML = '<option disabled>No cameras found</option>';
+              alert('No cameras found.');
+              return;
+            }
+
+            // Populate camera select
+            select.innerHTML = '';
+            cameras.forEach((cam, index) => {
+              const opt = document.createElement('option');
+              opt.value = cam;
+              opt.textContent = `Camera ${cam}`;
+              select.appendChild(opt);
+            });
+
+            // Set default video feed to first available camera
+            video.src = `/video_feed?cam_index=${cameras[0]}`;
+            select.value = cameras[0];
+          } catch (err) {
+            console.error('Failed to load cameras:', err);
+            select.innerHTML = '<option disabled>Error loading cameras</option>';
+          }
+        };
+      </script>
+      <div class="section" id="control-section">
+        <h2>Game Controls</h2>
+        <div class="control-group">
+          <label for="dealer-select"><strong>Dealer:</strong></label>
+          <select id="dealer-select">
+            <option value="0">Player 1 (NORTH)</option>
+            <option value="1">Player 2 (EAST)</option>
+            <option value="2">Player 3 (SOUTH)</option>
+            <option value="3">Player 4 (WEST)</option>
+          </select>
+
+          <label for="player-select"><strong>Bot Player:</strong></label>
+          <select id="player-select">
+            <option value="0">Player 1 (NORTH)</option>
+            <option value="1">Player 2 (EAST)</option>
+            <option value="2">Player 3 (SOUTH)</option>
+            <option value="3">Player 4 (WEST)</option>
+          </select>
+
+          <button id="reset-game-btn" onclick="resetGame()">Start Game</button>
+        </div>
+
+        <div class="control-group">
+          <label for="trump-select"><strong>Trump Action:</strong></label>
+          <select id="trump-select">
+            <option value="36">Schelle</option>
+            <option value="37">Rose</option>
+            <option value="38">Schilte</option>
+            <option value="39">Eichel</option>
+            <option value="40">Obe-Abe</option>
+            <option value="41">Une-Ufe</option>
+            <option value="42">Schiebe</option>
+          </select>
+
+          <button id="trump-btn" onclick="trumpAction()">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-column">
+      <div class="section" id="detection-section">
+        <h2>YOLO Detection</h2>
+        <div id="detection-state">Loading...</div>
+      </div>
+      <div class="section" id="bot-section">
+        <h2>Bot Action</h2>
+        <div id="bot-state">Loading...</div>
+      </div>
+      <div class="section" id="game-state-section">
+        <h2>Game State</h2>
+        <div id="game-state">Loading...</div>
+      </div>
+    </div>
+  </div>
+  <div class="section" id="log-section">
+    <h2>Application Logs</h2>
+    <div id="log-console" class="log-console">Connecting...</div>
+  </div>
+
+</body>
+
+</html>
